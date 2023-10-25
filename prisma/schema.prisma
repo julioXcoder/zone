@@ -18,50 +18,31 @@ model Post {
 }
 
 model Staff {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
-  password         String
-  firstName        String
-  lastName         String
-  roleId           String            @db.ObjectId
-  role             Role              @relation(fields: [roleId], references: [id])
-  subjectInstances SubjectInstance[]
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  password  String
+  firstName String
+  lastName  String
+  roleId    String @db.ObjectId
 }
 
 model Student {
-  id           String            @id @default(auto()) @map("_id") @db.ObjectId
-  password     String
-  firstName    String
-  lastName     String
-  yearId       String            @db.ObjectId
-  year         Year              @relation(fields: [yearId], references: [id])
-  role         String            @default("STUDENT")
-  studentYears StudentYear[]
-  positions    StudentPosition[]
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  password    String
+  firstName   String
+  lastName    String
+  positionId  String[] @db.ObjectId
+  programmeId String   @db.ObjectId
+  role        String   @default("STUDENT")
 }
 
 model Role {
-  id    String   @id @default(auto()) @map("_id") @db.ObjectId
-  name  RoleName @unique
-  staff Staff[]
+  id   String   @id @default(auto()) @map("_id") @db.ObjectId
+  name RoleName @unique
 }
 
 model Position {
-  id       String            @id @default(auto()) @map("_id") @db.ObjectId
-  name     PositionName      @unique
-  students StudentPosition[]
-}
-
-model StudentPosition {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  studentId  String   @db.ObjectId
-  positionId String   @db.ObjectId
-  student    Student  @relation(fields: [studentId], references: [id])
-  position   Position @relation(fields: [positionId], references: [id])
-}
-
-enum RoleName {
-  EXAMINATION_OFFICER
-  LECTURE
+  id   String       @id @default(auto()) @map("_id") @db.ObjectId
+  name PositionName @unique
 }
 
 enum PositionName {
@@ -69,128 +50,91 @@ enum PositionName {
   CLASS_REPRESENTATIVE
 }
 
+enum RoleName {
+  EXAMINATION_OFFICER
+  LECTURE
+}
+
 model AcademicYear {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  year      String     @unique
-  semesters Semester[]
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  name      String   @unique
 }
 
 model College {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  name        String       @unique
-  departments Department[]
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
 }
 
 model Department {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String   @unique
-  collegeId String   @db.ObjectId
-  college   College  @relation(fields: [collegeId], references: [id])
-  courses   Course[]
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  name      String @unique
+  collegeId String @db.ObjectId
 }
 
-model Course {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+model Programme {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  departmentId String     @db.ObjectId
-  department   Department @relation(fields: [departmentId], references: [id])
-  levels       Level[]
-}
-
-model Level {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String // This could be "Diploma", "Bachelor", "Master", etc.
-  courseId String @db.ObjectId
-  course   Course @relation(fields: [courseId], references: [id])
-  years    Year[]
-}
-
-model Year {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  name         String // This could be "First Year", "Second Year", etc.
-  levelId      String        @db.ObjectId
-  level        Level         @relation(fields: [levelId], references: [id])
-  students     Student[]
-  studentYears StudentYear[]
-  subjects     Subject[]
-}
-
-model CAComponent {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  marks     Int
-  CAId      String     @db.ObjectId
-  CA        CA         @relation(fields: [CAId], references: [id])
-  CAResults CAResult[]
-}
-
-model FinalResult {
-  id                String          @id @default(auto()) @map("_id") @db.ObjectId
-  marks             Int?
-  studentYearId     String          @db.ObjectId
-  studentYear       StudentYear     @relation(fields: [studentYearId], references: [id])
-  subjectInstanceId String          @db.ObjectId
-  subjectInstance   SubjectInstance @relation(fields: [subjectInstanceId], references: [id])
+  level        String
+  departmentId String @db.ObjectId
+  class        String
 }
 
 model Semester {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
-  name             String
-  academicYearId   String            @db.ObjectId
-  createdAt        DateTime          @default(now())
-  academicYear     AcademicYear      @relation(fields: [academicYearId], references: [id])
-  subjectInstances SubjectInstance[]
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  academicYearId String   @db.ObjectId
+  createdAt      DateTime @default(now())
 }
 
 model CAResult {
-  id                String          @id @default(auto()) @map("_id") @db.ObjectId
-  marks             Int?
-  studentYearId     String          @db.ObjectId
-  studentYear       StudentYear     @relation(fields: [studentYearId], references: [id])
-  componentId       String          @db.ObjectId
-  component         CAComponent     @relation(fields: [componentId], references: [id])
-  subjectInstanceId String          @db.ObjectId
-  subjectInstance   SubjectInstance @relation(fields: [subjectInstanceId], references: [id])
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  marks            Int?
+  studentId        String @db.ObjectId
+  componentId      String @db.ObjectId
+  courseInstanceId String @db.ObjectId
 }
 
-model CA {
-  id                String          @id @default(auto()) @map("_id") @db.ObjectId
-  subjectInstanceId String          @db.ObjectId
-  subjectInstance   SubjectInstance @relation(fields: [subjectInstanceId], references: [id])
-  components        CAComponent[]
+model UEResult {
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  marks            Int?
+  studentId        String @db.ObjectId
+  courseInstanceId String @db.ObjectId
 }
 
-model Subject {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+model CAComponent {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
   name             String
-  yearId           String            @db.ObjectId
-  year             Year              @relation(fields: [yearId], references: [id])
-  subjectInstances SubjectInstance[]
+  maxMarks         Int
+  type             String[] @db.ObjectId
+  courseInstanceId String   @db.ObjectId
 }
 
-model SubjectInstance {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  subjectId    String        @db.ObjectId
-  subject      Subject       @relation(fields: [subjectId], references: [id])
-  semesterId   String        @db.ObjectId
-  semester     Semester      @relation(fields: [semesterId], references: [id])
-  lecturerId   String        @db.ObjectId
-  lecturer     Staff         @relation(fields: [lecturerId], references: [id])
-  CAResults    CAResult[]
-  finalResults FinalResult[]
-  CAs          CA[]
-
-  @@unique([subjectId, semesterId])
+model CAComponentType {
+  id   String              @id @default(auto()) @map("_id") @db.ObjectId
+  name CAComponentTypeName @unique
 }
 
-model StudentYear {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  studentId    String        @db.ObjectId
-  student      Student       @relation(fields: [studentId], references: [id])
-  yearId       String        @db.ObjectId
-  year         Year          @relation(fields: [yearId], references: [id])
-  CAResults    CAResult[]
-  finalResults FinalResult[]
+enum CAComponentTypeName {
+  NORMAL
+  ASSIGNMENT
+}
 
-  @@unique([studentId, yearId])
+//TODO: Add points 
+model Course {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  code        String
+  unit        Int
+  status      String
+  programmeId String @db.ObjectId
+}
+
+//TODO: Add resources 
+model CourseInstance {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId     String   @db.ObjectId
+  semesterId   String   @db.ObjectId
+  lecturerId   String   @db.ObjectId
+  CAComponents String[] @db.ObjectId
 }
