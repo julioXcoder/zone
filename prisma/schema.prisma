@@ -26,13 +26,14 @@ model Staff {
 }
 
 model Student {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  password    String
-  firstName   String
-  lastName    String
-  positionId  String[] @db.ObjectId
-  programmeId String   @db.ObjectId
-  role        String   @default("STUDENT")
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  password      String
+  firstName     String
+  lastName      String
+  positionId    String[] @db.ObjectId
+  programmeId   String   @db.ObjectId
+  studentYearId String?  @db.ObjectId
+  role          String   @default("STUDENT")
 }
 
 model Role {
@@ -77,7 +78,16 @@ model Programme {
   name         String
   level        String
   departmentId String @db.ObjectId
-  class        String
+  length       Int
+}
+
+model StudentYear {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  studentId      String @db.ObjectId
+  academicYearId String @db.ObjectId
+  programmeId    String @db.ObjectId
+  semesterId     String @db.ObjectId
+  year           Int //1 , 2 . 3 depending on the programme length 
 }
 
 model Semester {
@@ -92,6 +102,7 @@ model CAResult {
   marks            Int?
   studentId        String @db.ObjectId
   componentId      String @db.ObjectId
+  studentYearId    String @db.ObjectId
   courseInstanceId String @db.ObjectId
 }
 
@@ -99,6 +110,7 @@ model UEResult {
   id               String @id @default(auto()) @map("_id") @db.ObjectId
   marks            Int?
   studentId        String @db.ObjectId
+  studentYearId    String @db.ObjectId
   courseInstanceId String @db.ObjectId
 }
 
