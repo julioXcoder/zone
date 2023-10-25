@@ -10,13 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  content   String
-  published Boolean
-}
-
 model Staff {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   password  String
@@ -26,14 +19,14 @@ model Staff {
 }
 
 model Student {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  password      String
-  firstName     String
-  lastName      String
-  positionId    String[] @db.ObjectId
-  programmeId   String   @db.ObjectId
-  studentYearId String?  @db.ObjectId
-  role          String   @default("STUDENT")
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  password            String
+  firstName           String
+  lastName            String
+  positionId          String[] @db.ObjectId
+  registrationHistory String[] @db.ObjectId
+  studentYearId       String?  @db.ObjectId
+  role                String   @default("STUDENT")
 }
 
 model Role {
@@ -90,6 +83,17 @@ model StudentYear {
   year           Int //1 , 2 . 3 depending on the programme length 
 }
 
+model RegistrationHistory {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentYearId  String   @db.ObjectId
+  academicYearId String   @db.ObjectId
+  dateRegistered DateTime @default(now())
+  semesterId     String   @db.ObjectId
+  status         String
+  registreredBy  String
+}
+
+//TODO: Add registration period
 model Semester {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   name           String
